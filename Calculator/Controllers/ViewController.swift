@@ -11,7 +11,19 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var displayLabel: UILabel!
     
-    var isFinishTypingNumber: Bool = true
+    private var isFinishTypingNumber: Bool = true
+    
+    private var displayValue: Double {
+        get {
+            guard let number = Double(displayLabel.text!) else {
+                fatalError("Cannot conver display label text to a Double!")
+            }
+            return number
+        }
+        set {
+            displayLabel.text = String(newValue)
+        }
+    }
     
     
     override func viewDidLoad() {
@@ -21,21 +33,20 @@ class ViewController: UIViewController {
         
     }
     
+    private var calculator = CalculatorLogic()
+    
     @IBAction func calcButtonPressed(_ sender: UIButton) {
         isFinishTypingNumber = true
-        guard let number = Double(displayLabel.text!) else {
-            fatalError("Cannot convert string to a double")
-        }
-            if let calcMethod = sender.currentTitle {
-                if calcMethod == "+/-" {
-                    displayLabel.text = String(format:"%.0f", number * -1)
-                } else if calcMethod == "AC" {
-                    displayLabel.text = String(format:"%.0f", 0)
-                } else if calcMethod == "%" {
-                    displayLabel.text = String(number / 100)
-                }
-            }
         
+        calculator.setNumber(displayValue)
+        
+        if let calcMethod = sender.currentTitle {
+            
+            if let result =  calculator.calculate(symbol: calcMethod) {
+                displayValue = result
+            }
+            
+        }
     }
     
     @IBAction func numButtonPressed(_ sender: UIButton) {
@@ -47,10 +58,10 @@ class ViewController: UIViewController {
             } else {
                 
                 if  numValue == "." {
-                    guard let currentDisplayLabel = Double(displayLabel.text!) else { return }
-                    let isInt = floor(currentDisplayLabel) == currentDisplayLabel
-                    print(floor(currentDisplayLabel))
-                    print(isInt)
+                
+                    let isInt = floor(displayValue) == displayValue
+//                    print(floor(displayValue))
+//                    print(isInt)
                     if !isInt {
                         return
                     }
